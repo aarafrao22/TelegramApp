@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.aaraf.telegramproxy.models.GetProxyList
+import com.aaraf.telegramproxy.models.NotificationModel
 import com.aaraf.telegramproxy.utilities.APIService
 import com.aaraf.telegramproxy.utilities.ServiceBuilder
 import retrofit2.Call
@@ -16,7 +17,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        getProxyList(token)
+//        getProxyList(token)
+        getNotification()
 
     }
 
@@ -33,6 +35,30 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<GetProxyList>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, t.toString(), Toast.LENGTH_LONG).show()
+                }
+
+            }
+        )
+    }
+
+    private fun getNotification() {
+        val response = ServiceBuilder.getInstance(APIService::class.java)
+        response.getNotification().enqueue(
+            object : Callback<NotificationModel> {
+                override fun onResponse(
+                    call: Call<NotificationModel>,
+                    response: Response<NotificationModel>
+                ) {
+                    val received: NotificationModel = response.body()!!
+                    Toast.makeText(
+                        this@MainActivity,
+                        received.notice, Toast.LENGTH_LONG
+                    )
+                        .show()
+                }
+
+                override fun onFailure(call: Call<NotificationModel>, t: Throwable) {
                     Toast.makeText(this@MainActivity, t.toString(), Toast.LENGTH_LONG).show()
                 }
 
