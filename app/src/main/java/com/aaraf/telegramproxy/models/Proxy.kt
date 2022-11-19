@@ -6,7 +6,8 @@ data class Proxy(
     val icon: String,
     val id: String,
     val level: Int,
-    val load: Int,
+    val load: String,
     val type: String,
-    val url: String
+    val url: String,
+    val text: String
 )
