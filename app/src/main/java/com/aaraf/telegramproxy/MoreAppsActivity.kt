@@ -9,5 +9,8 @@ class MoreAppsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_more_apps)
 
 
+
+
+
     }
 }
