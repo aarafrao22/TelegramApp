@@ -12,6 +12,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
+@Suppress("DEPRECATION")
 class MoreAppsActivity : AppCompatActivity() {
 
     var count = 0

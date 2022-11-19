@@ -1,7 +1,7 @@
-package com.aaraf.telegramproxy.Adapters
+package com.aaraf.telegramproxy.adapters
 
-import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +14,8 @@ import com.aaraf.telegramproxy.R
 import com.aaraf.telegramproxy.models.Proxy
 import com.bumptech.glide.Glide
 
-class MainRVAdapter(private val context: Context, val item: List<Proxy>) :
+
+class MainRVAdapter(private val item: List<Proxy>) :
     RecyclerView.Adapter<MainRVAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,11 +43,11 @@ class MainRVAdapter(private val context: Context, val item: List<Proxy>) :
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        var txtCountry: TextView = itemView.findViewById<TextView>(R.id.txtCountry)
-        var imgIcon: ImageView = itemView.findViewById<ImageView>(R.id.imgFlag)
-        var txtIP: TextView = itemView.findViewById<TextView>(R.id.txtIP)
-        var txtLoad: TextView = itemView.findViewById<TextView>(R.id.txtSpeed)
-        var txtType: TextView = itemView.findViewById<TextView>(R.id.txtType)
+        private var txtCountry: TextView = itemView.findViewById(R.id.txtCountry)
+        private var imgIcon: ImageView = itemView.findViewById(R.id.imgFlag)
+        private var txtIP: TextView = itemView.findViewById(R.id.txtIP)
+        private var txtLoad: TextView = itemView.findViewById(R.id.txtSpeed)
+        private var txtType: TextView = itemView.findViewById(R.id.txtType)
 
 
         fun setData(
@@ -62,21 +63,17 @@ class MainRVAdapter(private val context: Context, val item: List<Proxy>) :
             this.txtType.text = txtType
             this.txtCountry.text = country
             this.txtLoad.text = txtLoad
-            Glide.with(itemView.context).load(icon).into(imgIcon);
+            Glide.with(itemView.context).load(icon).into(imgIcon)
 
             itemView.findViewById<LinearLayout>(R.id.btnCTA).setOnClickListener {
-                Toast.makeText(itemView.context, "OpenAnotherApp here ${url}", Toast.LENGTH_SHORT)
+                Toast.makeText(itemView.context, "OpenAnotherApp here $url", Toast.LENGTH_SHORT)
                     .show()
+                val i = Intent(Intent.ACTION_VIEW)
+                i.data = Uri.parse(url)
+                itemView.context.startActivity(i)
             }
-//            itemView.setOnClickListener {
-//
-//                val setIntent = Intent(itemView.context, setActivity::class.java)
-//                setIntent.putExtra("Title", country)
-//                setIntent.putExtra("Sets", txtIP)
-//                itemView.context.startActivity(setIntent)
-//            }
+
+
         }
-
-
     }
 }

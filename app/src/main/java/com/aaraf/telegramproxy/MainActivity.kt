@@ -17,7 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
-import com.aaraf.telegramproxy.Adapters.MainRVAdapter
+import com.aaraf.telegramproxy.adapters.MainRVAdapter
 import com.aaraf.telegramproxy.models.GetProxyList
 import com.aaraf.telegramproxy.models.NotificationModel
 import com.aaraf.telegramproxy.models.Proxy
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val layout: LayoutManager =
             LinearLayoutManager(applicationContext, RecyclerView.VERTICAL, false)
         rv.layoutManager = layout
-        rvAdapter = MainRVAdapter(applicationContext, arrayList)
+        rvAdapter = MainRVAdapter(arrayList)
         rv.adapter = rvAdapter
     }
 
@@ -167,7 +167,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         //close navigation drawer
-        //close navigation drawer
         drawerLayout!!.closeDrawer(GravityCompat.START)
         return true
     }
@@ -181,7 +180,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             true
         } else super.onOptionsItemSelected(item)
     }
-
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
