@@ -1,6 +1,7 @@
 package com.aaraf.telegramproxy.utilities
 
 import com.aaraf.telegramproxy.models.GetProxyList
+import com.aaraf.telegramproxy.models.MoreAppsModel
 import com.aaraf.telegramproxy.models.NotificationModel
 import retrofit2.Call
 import retrofit2.http.GET
@@ -13,5 +14,8 @@ interface APIService {
 
     @GET("v1/notices")
     fun getNotification(): Call<NotificationModel>
+
+    @GET("v1/apps")
+    fun getMoreApps(): Call<MoreAppsModel>
 
 }

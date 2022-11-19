@@ -11,8 +11,8 @@
         android:id="@+id/toolbarMore"
         android:layout_width="match_parent"
         android:layout_height="?android:attr/actionBarSize"
-        android:gravity="center"
         android:background="@color/white"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
