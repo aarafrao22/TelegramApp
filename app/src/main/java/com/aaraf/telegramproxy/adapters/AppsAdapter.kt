@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.aaraf.telegramproxy.R
-import com.aaraf.telegramproxy.models.App
 import com.aaraf.telegramproxy.models.AppX
 import com.bumptech.glide.Glide
 

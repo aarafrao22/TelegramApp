@@ -16,6 +16,7 @@ import com.aaraf.telegramproxy.models.Proxy
 import com.bumptech.glide.Glide
 
 
+@Suppress("INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_WARNING")
 class MainRVAdapter(private val item: List<Proxy>) :
     RecyclerView.Adapter<MainRVAdapter.ViewHolder>() {
 
@@ -46,7 +47,8 @@ class MainRVAdapter(private val item: List<Proxy>) :
 
         private var txtCountry: TextView = itemView.findViewById(R.id.txtCountry)
         private var imgIcon: ImageView = itemView.findViewById(R.id.imgFlag)
-        private var txtIP: TextView = itemView.findViewById(R.id.txtIP)
+        private var imgSpeed: ImageView = itemView.findViewById(R.id.imgSpeed)
+        private var txtSecret: TextView = itemView.findViewById(R.id.txtSecret)
         private var txtLoad: TextView = itemView.findViewById(R.id.txtSpeed)
         private var txtType: TextView = itemView.findViewById(R.id.txtType)
 
@@ -60,17 +62,28 @@ class MainRVAdapter(private val item: List<Proxy>) :
             url: String
         ) {
             this.txtCountry.text = country
-            this.txtIP.text = txtIP
+            this.txtSecret.text = txtIP
             this.txtType.text = txtType
             this.txtCountry.text = country
             this.txtLoad.text = txtLoad
+
+            if (txtLoad.toInt() <= 30) {
+                //red
+                imgSpeed.setImageResource(R.drawable.red_ic_round_signal_cellular_alt)
+            } else if (txtLoad.toInt() <= 70) {
+                //yellow
+                imgSpeed.setImageResource(R.drawable.yellow_ic_round_signal_cellular_alt)
+            } else {
+
+                imgSpeed.setImageResource(R.drawable.ic_round_signal_cellular_alt)
+            }
             Glide.with(itemView.context).load(icon).into(imgIcon)
 
             itemView.findViewById<LinearLayout>(R.id.btnCTA).setOnClickListener {
 
                 try {
                     val i = Intent(Intent.ACTION_VIEW)
-                    i.setPackage("org.telegram.messenger");
+                    i.setPackage("org.telegram.messenger")
                     i.data = Uri.parse(url)
                     itemView.context.startActivity(i)
                 } catch (na: PackageManager.NameNotFoundException) {
