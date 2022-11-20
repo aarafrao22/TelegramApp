@@ -1,5 +1,8 @@
 package com.aaraf.telegramproxy.adapters
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -68,7 +71,13 @@ class AppsAdapter(private val item: List<AppX>) : RecyclerView.Adapter<AppsAdapt
             Glide.with(itemView.context).load(imgLogo).into(imgIcon)
 
             itemView.findViewById<LinearLayout>(R.id.btnDownload).setOnClickListener {
-                Toast.makeText(itemView.context, downloadUrl, Toast.LENGTH_SHORT).show()
+                try {
+                    val i = Intent(Intent.ACTION_VIEW)
+                    i.data = Uri.parse(downloadUrl)
+                    itemView.context.startActivity(i)
+                } catch (na: Exception) {
+                    Toast.makeText(itemView.context, na.toString(), Toast.LENGTH_SHORT).show()
+                }
             }
 
 
