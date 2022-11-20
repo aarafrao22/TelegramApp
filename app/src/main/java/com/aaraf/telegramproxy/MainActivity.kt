@@ -31,11 +31,11 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
     View.OnClickListener {
-    private lateinit var imgMsg: ImageView
     private var token = "testtoken"
     private var drawerLayout: DrawerLayout? = null
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
     private lateinit var rv: RecyclerView
+    private lateinit var imgMsg: ImageView
     private lateinit var rvAdapter: MainRVAdapter
 
     lateinit var arrayList: MutableList<Proxy>

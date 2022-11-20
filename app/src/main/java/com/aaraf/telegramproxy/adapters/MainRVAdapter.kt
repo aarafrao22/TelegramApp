@@ -1,6 +1,7 @@
 package com.aaraf.telegramproxy.adapters
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -66,11 +67,16 @@ class MainRVAdapter(private val item: List<Proxy>) :
             Glide.with(itemView.context).load(icon).into(imgIcon)
 
             itemView.findViewById<LinearLayout>(R.id.btnCTA).setOnClickListener {
-                Toast.makeText(itemView.context, "OpenAnotherApp here $url", Toast.LENGTH_SHORT)
-                    .show()
-                val i = Intent(Intent.ACTION_VIEW)
-                i.data = Uri.parse(url)
-                itemView.context.startActivity(i)
+
+                try {
+                    val i = Intent(Intent.ACTION_VIEW)
+                    i.setPackage("org.telegram.messenger");
+                    i.data = Uri.parse(url)
+                    itemView.context.startActivity(i)
+                } catch (na: PackageManager.NameNotFoundException) {
+                    Toast.makeText(itemView.context, "App not Installed", Toast.LENGTH_SHORT).show()
+                }
+
             }
 
 
