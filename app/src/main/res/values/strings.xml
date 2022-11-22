@@ -2,4 +2,16 @@
     <string name="app_name">Telegram Proxy</string>
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
+
+    <!--    App ID ~ ca-app-pub-9016979133569630~3036923034-->
+
+    <string name="App_ID">ca-app-pub-9016979133569630~3036923034</string>
+    <string name="Reward_Unit_ID">ca-app-pub-9016979133569630/3700936313</string>
+    <string name="Native_Unit_ID">ca-app-pub-9016979133569630/3122846651</string>
+    <string name="Open_Unit_ID">ca-app-pub-9016979133569630/3613801242</string>
+    <string name="Inter_Unit_ID">ca-app-pub-9016979133569630/3422229556 </string>
+    <string name="Banner_Unit_ID">ca-app-pub-9016979133569630/9796066213</string>
+    <string name="Rewarded_Inter">ca-app-pub-9016979133569630/2871565216</string>
+
+
 </resources>

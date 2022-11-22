@@ -1,4 +1,4 @@
-package com.aaraf.telegramproxy.adapters
+package com.bingo.helper_android.adapters
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,8 +11,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.aaraf.telegramproxy.R
-import com.aaraf.telegramproxy.models.Proxy
+import com.bingo.helper_android.R
+import com.bingo.helper_android.models.Proxy
 import com.bumptech.glide.Glide
 
 

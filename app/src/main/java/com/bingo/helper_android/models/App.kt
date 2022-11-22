@@ -1,6 +1,6 @@
-package com.aaraf.telegramproxy.models
+package com.bingo.helper_android.models
 
-data class AppX(
+data class App(
     val detail: String,
     val download: String,
     val id: String,

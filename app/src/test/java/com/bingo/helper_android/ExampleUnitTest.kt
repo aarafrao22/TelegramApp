@@ -1,4 +1,4 @@
-package com.aaraf.telegramproxy
+package com.bingo.helper_android
 
 import org.junit.Test
 

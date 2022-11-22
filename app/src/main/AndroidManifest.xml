@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.aaraf.telegramproxy">
+    package="com.bingo.helper_android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -11,22 +11,28 @@
         android:roundIcon="@mipmap/tele_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.TelegramProxy">
+
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9016979133569630~3036923034" />
+
         <activity
-            android:name=".MainActivity"
+            android:name="com.bingo.helper_android.MainActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".MoreAppsActivity"
+            android:name="com.bingo.helper_android.MoreAppsActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
         <activity
-            android:name=".SplashActivity"
+            android:name="com.bingo.helper_android.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

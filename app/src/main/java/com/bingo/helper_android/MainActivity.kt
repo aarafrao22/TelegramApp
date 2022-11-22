@@ -1,4 +1,4 @@
-package com.aaraf.telegramproxy
+package com.bingo.helper_android
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -17,39 +17,53 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
-import com.aaraf.telegramproxy.adapters.MainRVAdapter
-import com.aaraf.telegramproxy.models.GetProxyList
-import com.aaraf.telegramproxy.models.NotificationModel
-import com.aaraf.telegramproxy.models.Proxy
-import com.aaraf.telegramproxy.models.ProxyList
-import com.aaraf.telegramproxy.utilities.APIService
-import com.aaraf.telegramproxy.utilities.ServiceBuilder
+import com.bingo.helper_android.adapters.MainRVAdapter
+import com.bingo.helper_android.models.*
+import com.bingo.helper_android.utilities.APIService
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.material.navigation.NavigationView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
-    View.OnClickListener {
+    View.OnClickListener, OnUserEarnedRewardListener {
+    private var BASE_URL = ""
     private var token = "testtoken"
     private var drawerLayout: DrawerLayout? = null
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
     private lateinit var rv: RecyclerView
+    lateinit var adView: AdView
+
+    private var mInterstitialAd: InterstitialAd? = null
+    private final var TAG = "MainActivity"
     private lateinit var imgMsg: ImageView
     private lateinit var rvAdapter: MainRVAdapter
+    private var rewardedInterstitialAd: RewardedInterstitialAd? = null
 
     lateinit var arrayList: MutableList<Proxy>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+        getIntentData()
+        adView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        adView.loadAd(adRequest)
+
+
+
         drawerLayout = findViewById(R.id.my_drawer_layout)
-        actionBarDrawerToggle =
-            ActionBarDrawerToggle(
-                this, drawerLayout,
-                R.string.nav_open,
-                R.string.nav_close
-            )
+        actionBarDrawerToggle = ActionBarDrawerToggle(
+            this, drawerLayout, R.string.nav_open, R.string.nav_close
+        )
 
         drawerLayout!!.addDrawerListener(actionBarDrawerToggle!!)
         actionBarDrawerToggle!!.syncState()
@@ -66,6 +80,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         getProxyList(token)
         getNotification()
+
+    }
+
+    private fun getIntentData() {
+        BASE_URL = intent.getStringExtra("url").toString()
 
     }
 
@@ -86,8 +105,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getProxyList(s: String) {
-        val response = ServiceBuilder.getInstance(APIService::class.java)
-        response.getProxiesList(s).enqueue(object : Callback<GetProxyList> {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+        val call: Call<GetProxyList> = retrofitAPI.getProxiesList(s)
+
+        call.enqueue(object : Callback<GetProxyList> {
             override fun onResponse(
                 call: Call<GetProxyList>, response: Response<GetProxyList>
             ) {
@@ -106,8 +131,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getNotification() {
-        val response = ServiceBuilder.getInstance(APIService::class.java)
-        response.getNotification().enqueue(object : Callback<NotificationModel> {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+        val call: Call<NotificationModel> = retrofitAPI.getNotification()
+
+        call.enqueue(object : Callback<NotificationModel> {
             override fun onResponse(
                 call: Call<NotificationModel>, response: Response<NotificationModel>
             ) {
@@ -133,8 +164,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     shareIntent.type = "text/plain"
                     shareIntent.putExtra(Intent.EXTRA_SUBJECT, R.string.app_name)
                     var shareMessage = "\nLet me recommend you this application\n\n"
-                    shareMessage =
-                        """
+                    shareMessage = """
                 ${shareMessage}https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}
 
 
@@ -152,8 +182,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 try {
                     startActivity(
                         Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("market://details?id=$packageName")
+                            Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")
                         )
                     )
                 } catch (e: ActivityNotFoundException) {
@@ -184,8 +213,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.imgMsg -> {
-                startActivity(Intent(applicationContext, MoreAppsActivity::class.java))
+                var intent = Intent(this@MainActivity, MoreAppsActivity::class.java)
+                intent.putExtra("url", BASE_URL)
+                startActivity(intent)
             }
         }
+    }
+
+    override fun onUserEarnedReward(p0: RewardItem) {
+
     }
 }
