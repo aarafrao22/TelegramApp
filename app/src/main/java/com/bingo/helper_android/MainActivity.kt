@@ -22,6 +22,8 @@ import com.bingo.helper_android.models.*
 import com.bingo.helper_android.utilities.APIService
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.material.navigation.NavigationView
@@ -54,11 +56,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         getIntentData()
-        adView = findViewById(R.id.adView)
-        val adRequest = AdRequest.Builder().build()
-        adView.loadAd(adRequest)
 
-
+        nativeAd()
 
         drawerLayout = findViewById(R.id.my_drawer_layout)
         actionBarDrawerToggle = ActionBarDrawerToggle(
@@ -83,6 +82,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    private fun nativeAd() {
+        val adLoader = AdLoader.Builder(this, "ca-app-pub-3940256099942544/2247696110")
+            .forNativeAd { ad: NativeAd ->
+
+            }
+            .withAdListener(object : AdListener() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                }
+            })
+            .withNativeAdOptions(
+                NativeAdOptions.Builder().build()
+            )
+            .build()
+        adLoader.loadAds(AdRequest.Builder().build(), 3)
+
+
+    }
+
     private fun getIntentData() {
         BASE_URL = intent.getStringExtra("url").toString()
 
@@ -100,7 +117,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val layout: LayoutManager =
             LinearLayoutManager(applicationContext, RecyclerView.VERTICAL, false)
         rv.layoutManager = layout
-        rvAdapter = MainRVAdapter(arrayList)
+        rvAdapter = MainRVAdapter(this@MainActivity, arrayList)
         rv.adapter = rvAdapter
     }
 

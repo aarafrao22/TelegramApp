@@ -44,8 +44,7 @@ class SplashActivity : AppCompatActivity() {
                 val receivedObj: BaseURLModel = response.body()!!
 
                 BASE_URL = receivedObj.url + "/"
-                Toast.makeText(this@SplashActivity, receivedObj.toString(), Toast.LENGTH_LONG)
-                    .show()
+
 
                 val handler = Handler()
                 handler.postDelayed({

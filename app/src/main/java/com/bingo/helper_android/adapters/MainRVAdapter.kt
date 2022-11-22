@@ -1,8 +1,12 @@
 package com.bingo.helper_android.adapters
 
+import android.app.Activity
+import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,11 +18,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bingo.helper_android.R
 import com.bingo.helper_android.models.Proxy
 import com.bumptech.glide.Glide
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
 
 @Suppress("INFERRED_TYPE_VARIABLE_INTO_EMPTY_INTERSECTION_WARNING")
-class MainRVAdapter(private val item: List<Proxy>) :
+class MainRVAdapter(private val activity: Activity, private val item: List<Proxy>) :
     RecyclerView.Adapter<MainRVAdapter.ViewHolder>() {
+    private var mRewardedAd: RewardedAd? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
@@ -61,6 +73,7 @@ class MainRVAdapter(private val item: List<Proxy>) :
             txtLoad: String,
             url: String
         ) {
+
             this.txtCountry.text = country
             this.txtSecret.text = txtIP
             this.txtType.text = txtType
@@ -80,12 +93,26 @@ class MainRVAdapter(private val item: List<Proxy>) :
             Glide.with(itemView.context).load(icon).into(imgIcon)
 
             itemView.findViewById<LinearLayout>(R.id.btnCTA).setOnClickListener {
-
+                loadAd()
                 try {
-                    val i = Intent(Intent.ACTION_VIEW)
-                    i.setPackage("org.telegram.messenger")
-                    i.data = Uri.parse(url)
-                    itemView.context.startActivity(i)
+                    if (mRewardedAd != null) {
+                        mRewardedAd?.show(activity) {
+                            fun onUserEarnedReward(rewardItem: RewardItem) {
+                                val i = Intent(Intent.ACTION_VIEW)
+                                i.setPackage("org.telegram.messenger")
+                                i.data = Uri.parse(url)
+                                itemView.context.startActivity(i)
+                            }
+                        }
+                    } else {
+
+                        val i = Intent(Intent.ACTION_VIEW)
+                        i.setPackage("org.telegram.messenger")
+                        i.data = Uri.parse(url)
+                        itemView.context.startActivity(i)
+
+                    }
+
                 } catch (na: PackageManager.NameNotFoundException) {
                     Toast.makeText(itemView.context, "App not Installed", Toast.LENGTH_SHORT).show()
                 }
@@ -93,6 +120,46 @@ class MainRVAdapter(private val item: List<Proxy>) :
             }
 
 
+        }
+    }
+
+    private fun loadAd() {
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(
+            activity,
+            "ca-app-pub-3940256099942544/5224354917",
+            adRequest,
+            object : RewardedAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    Log.d(TAG, adError.toString())
+                    mRewardedAd = null
+                }
+
+                override fun onAdLoaded(rewardedAd: RewardedAd) {
+                    Log.d(TAG, "Ad was loaded.")
+                    mRewardedAd = rewardedAd
+                }
+            })
+        mRewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdClicked() {
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                // Called when ad is dismissed.
+                // Set the ad reference to null so you don't show the ad a second time.
+                Log.d(TAG, "Ad dismissed fullscreen content.")
+                mRewardedAd = null
+            }
+
+            override fun onAdImpression() {
+                // Called when an impression is recorded for an ad.
+                Log.d(TAG, "Ad recorded an impression.")
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                // Called when ad is shown.
+                Log.d(TAG, "Ad showed fullscreen content.")
+            }
         }
     }
 }
