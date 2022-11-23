@@ -77,6 +77,7 @@ class MoreAppsActivity : AppCompatActivity(), View.OnClickListener {
             override fun onFailure(call: Call<MoreAppsModel>, t: Throwable) {
                 Toast.makeText(this@MoreAppsActivity, t.toString(), Toast.LENGTH_LONG).show()
 
+                //retry at least 3 times in case of any error
                 if (count < 3) {
                     Handler().postDelayed({
                         getMoreApps()

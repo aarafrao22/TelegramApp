@@ -21,11 +21,7 @@ import com.bingo.helper_android.adapters.MainRVAdapter
 import com.bingo.helper_android.models.*
 import com.bingo.helper_android.utilities.APIService
 import com.google.android.gms.ads.*
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.nativead.NativeAd
-import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.rewarded.RewardItem
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.material.navigation.NavigationView
 import retrofit2.Call
 import retrofit2.Callback
@@ -40,13 +36,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var drawerLayout: DrawerLayout? = null
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
     private lateinit var rv: RecyclerView
-    lateinit var adView: AdView
+    lateinit var mAdView : AdView
 
-    private var mInterstitialAd: InterstitialAd? = null
-    private final var TAG = "MainActivity"
     private lateinit var imgMsg: ImageView
     private lateinit var rvAdapter: MainRVAdapter
-    private var rewardedInterstitialAd: RewardedInterstitialAd? = null
 
     lateinit var arrayList: MutableList<Proxy>
 
@@ -56,8 +49,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         getIntentData()
-
-        nativeAd()
+        getBannerAd()
 
         drawerLayout = findViewById(R.id.my_drawer_layout)
         actionBarDrawerToggle = ActionBarDrawerToggle(
@@ -82,23 +74,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private fun nativeAd() {
-        val adLoader = AdLoader.Builder(this, "ca-app-pub-3940256099942544/2247696110")
-            .forNativeAd { ad: NativeAd ->
+    private fun getBannerAd() {
+        var adView = AdView(this)
+        adView.adUnitId = getString(R.string.Banner_Unit_ID)
+        MobileAds.initialize(this) {}
 
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
+        mAdView.adListener = object: AdListener() {
+            override fun onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
             }
-            .withAdListener(object : AdListener() {
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                }
-            })
-            .withNativeAdOptions(
-                NativeAdOptions.Builder().build()
-            )
-            .build()
-        adLoader.loadAds(AdRequest.Builder().build(), 3)
 
+            override fun onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+
+            override fun onAdFailedToLoad(adError : LoadAdError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            override fun onAdImpression() {
+                // Code to be executed when an impression is recorded
+                // for an ad.
+            }
+
+            override fun onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            override fun onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+        }
 
     }
+
 
     private fun getIntentData() {
         BASE_URL = intent.getStringExtra("url").toString()
@@ -230,7 +245,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.imgMsg -> {
-                var intent = Intent(this@MainActivity, MoreAppsActivity::class.java)
+                val intent = Intent(this@MainActivity, MoreAppsActivity::class.java)
                 intent.putExtra("url", BASE_URL)
                 startActivity(intent)
             }

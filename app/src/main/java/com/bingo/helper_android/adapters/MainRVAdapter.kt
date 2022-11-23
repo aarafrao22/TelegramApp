@@ -61,6 +61,8 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
         private var imgIcon: ImageView = itemView.findViewById(R.id.imgFlag)
         private var imgSpeed: ImageView = itemView.findViewById(R.id.imgSpeed)
         private var txtSecret: TextView = itemView.findViewById(R.id.txtSecret)
+        private var txtIP: TextView = itemView.findViewById(R.id.txtIP)
+        private var txtPort: TextView = itemView.findViewById(R.id.txtPort)
         private var txtLoad: TextView = itemView.findViewById(R.id.txtSpeed)
         private var txtType: TextView = itemView.findViewById(R.id.txtType)
 
@@ -74,11 +76,16 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
             url: String
         ) {
 
+            val raw = url.split("&");
+            Log.d(TAG, "setData: $raw")
             this.txtCountry.text = country
             this.txtSecret.text = txtIP
             this.txtType.text = txtType
             this.txtCountry.text = country
             this.txtLoad.text = txtLoad
+            this.txtPort.text = raw[1]
+            this.txtIP.text = raw[0].split("server=").get(1)
+
 
             if (txtLoad.toInt() <= 30) {
                 //red
