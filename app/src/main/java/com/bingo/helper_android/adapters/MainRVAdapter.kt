@@ -2,7 +2,6 @@ package com.bingo.helper_android.adapters
 
 import android.app.Activity
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -21,8 +20,7 @@ import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
-import com.google.android.gms.ads.rewarded.RewardItem
+import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
@@ -100,17 +98,19 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
             Glide.with(itemView.context).load(icon).into(imgIcon)
 
             itemView.findViewById<LinearLayout>(R.id.btnCTA).setOnClickListener {
-                loadAd()
+                loadAd(itemView)
                 try {
                     if (mRewardedAd != null) {
-                        mRewardedAd?.show(activity) {
-                            fun onUserEarnedReward(rewardItem: RewardItem) {
-                                val i = Intent(Intent.ACTION_VIEW)
-                                i.setPackage("org.telegram.messenger")
-                                i.data = Uri.parse(url)
-                                itemView.context.startActivity(i)
-                            }
-                        }
+                        mRewardedAd!!.show(activity, OnUserEarnedRewardListener {
+                            val i = Intent(Intent.ACTION_VIEW)
+                            i.setPackage("org.telegram.messenger")
+                            i.data = Uri.parse(url)
+                            itemView.context.startActivity(i)
+                        })
+//                        mRewardedAd?.show(activity) {
+//                            fun onUserEarnedReward(rewardItem: RewardItem) {
+//                            }
+//                        }
                     } else {
 
                         val i = Intent(Intent.ACTION_VIEW)
@@ -130,10 +130,11 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
         }
     }
 
-    private fun loadAd() {
+    private fun loadAd(itemView: View) {
         val adRequest = AdRequest.Builder().build()
         RewardedAd.load(
             activity,
+//            itemView.context.getString(R.string.Reward_Unit_ID),
             "ca-app-pub-3940256099942544/5224354917",
             adRequest,
             object : RewardedAdLoadCallback() {
