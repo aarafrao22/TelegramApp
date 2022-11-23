@@ -17,8 +17,12 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bingo.helper_android.adapters.MainRVAdapter
-import com.bingo.helper_android.models.*
+import com.bingo.helper_android.models.GetProxyList
+import com.bingo.helper_android.models.NotificationModel
+import com.bingo.helper_android.models.Proxy
+import com.bingo.helper_android.models.ProxyList
 import com.bingo.helper_android.utilities.APIService
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.rewarded.RewardItem
@@ -29,6 +33,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
     View.OnClickListener, OnUserEarnedRewardListener {
     private var BASE_URL = ""
@@ -36,7 +41,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var drawerLayout: DrawerLayout? = null
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
     private lateinit var rv: RecyclerView
-    lateinit var mAdView : AdView
+    private lateinit var mAdView: AdView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private lateinit var imgMsg: ImageView
     private lateinit var rvAdapter: MainRVAdapter
@@ -51,7 +57,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         getIntentData()
         getBannerAd()
 
+
         drawerLayout = findViewById(R.id.my_drawer_layout)
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
         actionBarDrawerToggle = ActionBarDrawerToggle(
             this, drawerLayout, R.string.nav_open, R.string.nav_close
         )
@@ -59,12 +67,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout!!.addDrawerListener(actionBarDrawerToggle!!)
         actionBarDrawerToggle!!.syncState()
         setNavigationViewListener()
+
         val toolbar = findViewById<Toolbar>(R.id.mainToolbar)
         setSupportActionBar(toolbar)
+
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         val drawable = AppCompatResources.getDrawable(applicationContext, R.drawable.bg_wh)
         supportActionBar!!.setBackgroundDrawable(drawable)
         supportActionBar!!.setHomeAsUpIndicator(R.drawable.vector)
+
+        swipeRefreshLayout.setOnRefreshListener {
+
+            arrayList = mutableListOf()
+            getProxyList(token)
+            swipeRefreshLayout.isRefreshing = false
+
+        }
 
         arrayList = mutableListOf()
         recyclerView()
@@ -75,7 +93,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getBannerAd() {
-        var adView = AdView(this)
+        val adView = AdView(this)
         adView.adUnitId = getString(R.string.Banner_Unit_ID)
         MobileAds.initialize(this) {}
 
@@ -83,7 +101,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val adRequest = AdRequest.Builder().build()
         mAdView.loadAd(adRequest)
 
-        mAdView.adListener = object: AdListener() {
+        mAdView.adListener = object : AdListener() {
             override fun onAdClicked() {
                 // Code to be executed when the user clicks on an ad.
             }
@@ -93,7 +111,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 // to the app after tapping on an ad.
             }
 
-            override fun onAdFailedToLoad(adError : LoadAdError) {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
                 // Code to be executed when an ad request fails.
             }
 
@@ -117,7 +135,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun getIntentData() {
         BASE_URL = intent.getStringExtra("url").toString()
-
     }
 
     private fun setNavigationViewListener() {

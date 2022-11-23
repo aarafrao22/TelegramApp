@@ -107,10 +107,7 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
                             i.data = Uri.parse(url)
                             itemView.context.startActivity(i)
                         })
-//                        mRewardedAd?.show(activity) {
-//                            fun onUserEarnedReward(rewardItem: RewardItem) {
-//                            }
-//                        }
+
                     } else {
 
                         val i = Intent(Intent.ACTION_VIEW)
