@@ -12,6 +12,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.lang.NullPointerException
 
 
 @Suppress("DEPRECATION")
@@ -29,47 +30,60 @@ class SplashActivity : AppCompatActivity() {
 
     private fun getURL() {
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.muzhifei.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        try {
+            val retrofit = Retrofit.Builder()
+                .baseUrl("https://api.muzhifei.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
 
-        val retrofitAPI: APIService = retrofit.create(APIService::class.java)
-        val call: Call<BaseURLModel> = retrofitAPI.getBaseURL()
+            val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+            val call: Call<BaseURLModel> = retrofitAPI.getBaseURL()
 
-        call.enqueue(object : Callback<BaseURLModel> {
-            override fun onResponse(
-                call: Call<BaseURLModel>, response: Response<BaseURLModel>
-            ) {
-                val receivedObj: BaseURLModel = response.body()!!
+            call.enqueue(object : Callback<BaseURLModel> {
+                override fun onResponse(
+                    call: Call<BaseURLModel>, response: Response<BaseURLModel>
+                ) {
+                    if (response.body() != null) {
+                        val receivedObj: BaseURLModel = response.body()!!
+                        BASE_URL = receivedObj.url + "/"
 
-                BASE_URL = receivedObj.url + "/"
+                        val handler = Handler()
+                        handler.postDelayed({
+
+                            val openMainActivity =
+                                Intent(this@SplashActivity, MainActivity::class.java)
+                            openMainActivity.putExtra("url", BASE_URL)
+                            startActivity(openMainActivity)
+                            finish()
+
+                        }, 3000)
+                    } else {
+                        Toast.makeText(
+                            this@SplashActivity,
+                            "Try Again in a few moments",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
 
 
-                val handler = Handler()
-                handler.postDelayed({
-
-                    val openMainActivity = Intent(this@SplashActivity, MainActivity::class.java)
-                    openMainActivity.putExtra("url", BASE_URL)
-                    startActivity(openMainActivity)
-                    finish()
-
-                }, 3000)
-
-            }
-
-            override fun onFailure(call: Call<BaseURLModel>, t: Throwable) {
-                Toast.makeText(this@SplashActivity, t.toString(), Toast.LENGTH_LONG).show()
-
-                if (count < 3) {
-                    Handler().postDelayed({
-                        getURL()
-                    }, 1000)
                 }
-                count++
-            }
 
-        })
+                override fun onFailure(call: Call<BaseURLModel>, t: Throwable) {
+                    Toast.makeText(this@SplashActivity, t.toString(), Toast.LENGTH_LONG).show()
+
+                    if (count < 3) {
+                        Handler().postDelayed({
+                            getURL()
+                        }, 1000)
+                    }
+                    count++
+                }
+
+            })
+        } catch (exc: NullPointerException) {
+            Toast.makeText(this@SplashActivity, "Something Went Wrong", Toast.LENGTH_LONG).show()
+        }
+
     }
 
 }
