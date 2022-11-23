@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             arrayList = mutableListOf()
             getProxyList(token)
-            swipeRefreshLayout.isRefreshing = false
+//            swipeRefreshLayout.isRefreshing = false
 
         }
 
@@ -170,6 +170,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     arrayList.add(p)
                 }
                 rvAdapter.notifyDataSetChanged()
+                swipeRefreshLayout.isRefreshing = false
             }
 
             override fun onFailure(call: Call<GetProxyList>, t: Throwable) {

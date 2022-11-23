@@ -20,7 +20,6 @@ import com.bumptech.glide.Glide
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.OnUserEarnedRewardListener
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 
@@ -74,7 +73,7 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
             url: String
         ) {
 
-            val raw = url.split("&");
+            val raw = url.split("&")
             Log.d(TAG, "setData: $raw")
             this.txtCountry.text = country
             this.txtSecret.text = txtIP
@@ -82,7 +81,7 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
             this.txtCountry.text = country
             this.txtLoad.text = txtLoad
             this.txtPort.text = raw[1]
-            this.txtIP.text = raw[0].split("server=").get(1)
+            this.txtIP.text = raw[0].split("server=")[1]
 
 
             if (txtLoad.toInt() <= 30) {
@@ -98,15 +97,16 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
             Glide.with(itemView.context).load(icon).into(imgIcon)
 
             itemView.findViewById<LinearLayout>(R.id.btnCTA).setOnClickListener {
-                loadAd(itemView)
+                loadAd()
                 try {
                     if (mRewardedAd != null) {
-                        mRewardedAd!!.show(activity, OnUserEarnedRewardListener {
+
+                        mRewardedAd!!.show(activity) {
                             val i = Intent(Intent.ACTION_VIEW)
                             i.setPackage("org.telegram.messenger")
                             i.data = Uri.parse(url)
                             itemView.context.startActivity(i)
-                        })
+                        }
 
                     } else {
 
@@ -127,7 +127,7 @@ class MainRVAdapter(private val activity: Activity, private val item: List<Proxy
         }
     }
 
-    private fun loadAd(itemView: View) {
+    private fun loadAd() {
         val adRequest = AdRequest.Builder().build()
         RewardedAd.load(
             activity,
