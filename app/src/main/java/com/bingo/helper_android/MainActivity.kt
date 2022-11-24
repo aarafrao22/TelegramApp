@@ -77,11 +77,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportActionBar!!.setHomeAsUpIndicator(R.drawable.vector)
 
         swipeRefreshLayout.setOnRefreshListener {
-
-            arrayList = mutableListOf()
             getProxyList(token)
-//            swipeRefreshLayout.isRefreshing = false
-
         }
 
         arrayList = mutableListOf()
@@ -154,55 +150,68 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getProxyList(s: String) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val retrofitAPI: APIService = retrofit.create(APIService::class.java)
-        val call: Call<GetProxyList> = retrofitAPI.getProxiesList(s)
+        if (BASE_URL != "") {
 
-        call.enqueue(object : Callback<GetProxyList> {
-            override fun onResponse(
-                call: Call<GetProxyList>, response: Response<GetProxyList>
-            ) {
-                val receivedObj: ProxyList = response.body()!!.proxylist
-                for (p in receivedObj.proxy) {
-                    arrayList.add(p)
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+            val call: Call<GetProxyList> = retrofitAPI.getProxiesList(s)
+
+            call.enqueue(object : Callback<GetProxyList> {
+                override fun onResponse(
+                    call: Call<GetProxyList>, response: Response<GetProxyList>
+                ) {
+                    if (response.body() != null) {
+                        arrayList = mutableListOf()
+                        val receivedObj: ProxyList = response.body()!!.proxylist
+                        for (p in receivedObj.proxy) {
+                            arrayList.add(p)
+                        }
+                        rvAdapter.notifyDataSetChanged()
+                        swipeRefreshLayout.isRefreshing = false
+                        recyclerView()
+                    }
+
                 }
-                rvAdapter.notifyDataSetChanged()
-                swipeRefreshLayout.isRefreshing = false
-            }
 
-            override fun onFailure(call: Call<GetProxyList>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.toString(), Toast.LENGTH_LONG).show()
-            }
+                override fun onFailure(call: Call<GetProxyList>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, t.toString(), Toast.LENGTH_LONG).show()
+                }
 
-        })
+            })
+        }
+
     }
 
     private fun getNotification() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val retrofitAPI: APIService = retrofit.create(APIService::class.java)
-        val call: Call<NotificationModel> = retrofitAPI.getNotification()
+        if (BASE_URL != "") {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+            val call: Call<NotificationModel> = retrofitAPI.getNotification()
 
-        call.enqueue(object : Callback<NotificationModel> {
-            override fun onResponse(
-                call: Call<NotificationModel>, response: Response<NotificationModel>
-            ) {
-                val received: NotificationModel = response.body()!!
-                Toast.makeText(
-                    this@MainActivity, received.notice, Toast.LENGTH_LONG
-                ).show()
-            }
+            call.enqueue(object : Callback<NotificationModel> {
+                override fun onResponse(
+                    call: Call<NotificationModel>, response: Response<NotificationModel>
+                ) {
+                    val received: NotificationModel = response.body()!!
+                    Toast.makeText(
+                        this@MainActivity, received.notice, Toast.LENGTH_LONG
+                    ).show()
+                }
 
-            override fun onFailure(call: Call<NotificationModel>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.toString(), Toast.LENGTH_LONG).show()
-            }
+                override fun onFailure(call: Call<NotificationModel>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, t.toString(), Toast.LENGTH_LONG).show()
+                }
 
-        })
+            })
+        }
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {

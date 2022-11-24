@@ -56,37 +56,40 @@ class MoreAppsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun getMoreApps() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val retrofitAPI: APIService = retrofit.create(APIService::class.java)
-        val call: Call<MoreAppsModel> = retrofitAPI.getMoreApps()
+        if (BASE_URL != "") {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+            val call: Call<MoreAppsModel> = retrofitAPI.getMoreApps()
 
-        call.enqueue(object : Callback<MoreAppsModel> {
-            override fun onResponse(
-                call: Call<MoreAppsModel>, response: Response<MoreAppsModel>
-            ) {
-                val receivedObj: MoreAppsModel = response.body()!!
-                for (p in receivedObj.apps) {
-                    arrayList.add(p)
+            call.enqueue(object : Callback<MoreAppsModel> {
+                override fun onResponse(
+                    call: Call<MoreAppsModel>, response: Response<MoreAppsModel>
+                ) {
+                    val receivedObj: MoreAppsModel = response.body()!!
+                    for (p in receivedObj.apps) {
+                        arrayList.add(p)
+                    }
+                    rvAdapter.notifyDataSetChanged()
                 }
-                rvAdapter.notifyDataSetChanged()
-            }
 
-            override fun onFailure(call: Call<MoreAppsModel>, t: Throwable) {
-                Toast.makeText(this@MoreAppsActivity, t.toString(), Toast.LENGTH_LONG).show()
+                override fun onFailure(call: Call<MoreAppsModel>, t: Throwable) {
+                    Toast.makeText(this@MoreAppsActivity, t.toString(), Toast.LENGTH_LONG).show()
 
-                //retry at least 3 times in case of any error
-                if (count < 3) {
-                    Handler().postDelayed({
-                        getMoreApps()
-                    }, 1000)
+                    //retry at least 3 times in case of any error
+                    if (count < 3) {
+                        Handler().postDelayed({
+                            getMoreApps()
+                        }, 1000)
+                    }
+                    count++
                 }
-                count++
-            }
 
-        })
+            })
+
+        }
     }
 
     override fun onClick(p0: View?) {
