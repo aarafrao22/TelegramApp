@@ -1,9 +1,11 @@
 package com.bingo.helper_android
 
 import android.content.ActivityNotFoundException
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -19,10 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bingo.helper_android.adapters.MainRVAdapter
-import com.bingo.helper_android.models.GetProxyList
-import com.bingo.helper_android.models.NotificationModel
-import com.bingo.helper_android.models.Proxy
-import com.bingo.helper_android.models.ProxyList
+import com.bingo.helper_android.models.*
 import com.bingo.helper_android.utilities.APIService
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.rewarded.RewardItem
@@ -57,7 +56,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         getIntentData()
         getBannerAd()
 
-
         drawerLayout = findViewById(R.id.my_drawer_layout)
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
         actionBarDrawerToggle = ActionBarDrawerToggle(
@@ -77,7 +75,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportActionBar!!.setHomeAsUpIndicator(R.drawable.vector)
 
         swipeRefreshLayout.setOnRefreshListener {
-            getProxyList(token)
+            Log.d(TAG, "swiped")
+            getURL()
         }
 
         arrayList = mutableListOf()
@@ -86,6 +85,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         getProxyList(token)
         getNotification()
 
+    }
+
+    private fun getURL() {
+
+            val retrofit = Retrofit.Builder()
+                .baseUrl("https://api.muzhifei.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+            val call: Call<BaseURLModel> = retrofitAPI.getBaseURL()
+
+            call.enqueue(object : Callback<BaseURLModel> {
+                override fun onResponse(
+                    call: Call<BaseURLModel>, response: Response<BaseURLModel>
+                ) {
+                    swipeRefreshLayout.isRefreshing = false
+                    if (response.body() != null) {
+                        val receivedObj: BaseURLModel = response.body()!!
+                        BASE_URL = receivedObj.url + "/"
+                        getProxyList(token)
+
+                    }else{
+                        Toast.makeText(this@MainActivity, "Server Not responding", Toast.LENGTH_LONG).show()
+                    }
+
+                }
+
+                override fun onFailure(call: Call<BaseURLModel>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, t.toString(), Toast.LENGTH_LONG).show()
+
+                }
+
+            })
     }
 
     private fun getBannerAd() {
@@ -112,7 +145,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             override fun onAdImpression() {
-                // Code to be executed when an impression is recorded
+                Log.d(TAG, "onAdImpression: Code to be executed when an impression is recorded")
+            // Code to be executed when an impression is recorded
                 // for an ad.
             }
 
@@ -167,11 +201,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     if (response.body() != null) {
                         arrayList = mutableListOf()
                         val receivedObj: ProxyList = response.body()!!.proxylist
+                        Log.d(TAG, "swipeResponse: $receivedObj")
                         for (p in receivedObj.proxy) {
                             arrayList.add(p)
                         }
                         rvAdapter.notifyDataSetChanged()
-                        swipeRefreshLayout.isRefreshing = false
                         recyclerView()
                     }
 

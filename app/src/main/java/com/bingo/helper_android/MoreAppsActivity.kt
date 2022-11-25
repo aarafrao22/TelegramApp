@@ -33,7 +33,7 @@ class MoreAppsActivity : AppCompatActivity(), View.OnClickListener {
 
         getIntentData()
 
-        getMoreApps()
+        getURL()
         arrayList = mutableListOf()
         recyclerView()
 
@@ -55,12 +55,52 @@ class MoreAppsActivity : AppCompatActivity(), View.OnClickListener {
         rv.adapter = rvAdapter
     }
 
+    private fun getURL() {
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.muzhifei.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val retrofitAPI: APIService = retrofit.create(APIService::class.java)
+        val call: Call<BaseURLModel> = retrofitAPI.getBaseURL()
+
+        call.enqueue(object : Callback<BaseURLModel> {
+            override fun onResponse(
+                call: Call<BaseURLModel>, response: Response<BaseURLModel>
+            ) {
+                if (response.body() != null) {
+                    val receivedObj: BaseURLModel = response.body()!!
+                    BASE_URL = receivedObj.url + "/"
+                    getMoreApps()
+
+                } else {
+                    Toast.makeText(
+                        this@MoreAppsActivity,
+                        "Server Not responding",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            }
+
+            override fun onFailure(call: Call<BaseURLModel>, t: Throwable) {
+                Toast.makeText(this@MoreAppsActivity, t.toString(), Toast.LENGTH_LONG).show()
+
+            }
+
+        })
+    }
+
     private fun getMoreApps() {
+
         if (BASE_URL != "") {
+
             val retrofit = Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
+
             val retrofitAPI: APIService = retrofit.create(APIService::class.java)
             val call: Call<MoreAppsModel> = retrofitAPI.getMoreApps()
 
@@ -68,11 +108,13 @@ class MoreAppsActivity : AppCompatActivity(), View.OnClickListener {
                 override fun onResponse(
                     call: Call<MoreAppsModel>, response: Response<MoreAppsModel>
                 ) {
-                    val receivedObj: MoreAppsModel = response.body()!!
-                    for (p in receivedObj.apps) {
-                        arrayList.add(p)
+                    if (response.body() != null) {
+                        val receivedObj: MoreAppsModel = response.body()!!
+                        for (p in receivedObj.apps) {
+                            arrayList.add(p)
+                        }
+                        rvAdapter.notifyDataSetChanged()
                     }
-                    rvAdapter.notifyDataSetChanged()
                 }
 
                 override fun onFailure(call: Call<MoreAppsModel>, t: Throwable) {
@@ -81,7 +123,7 @@ class MoreAppsActivity : AppCompatActivity(), View.OnClickListener {
                     //retry at least 3 times in case of any error
                     if (count < 3) {
                         Handler().postDelayed({
-                            getMoreApps()
+                            getURL()
                         }, 1000)
                     }
                     count++

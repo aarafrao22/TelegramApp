@@ -1,5 +1,6 @@
 package com.bingo.helper_android
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -15,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.NullPointerException
 
 
+@SuppressLint("CustomSplashScreen")
 @Suppress("DEPRECATION")
 class SplashActivity : AppCompatActivity() {
     var count = 0
